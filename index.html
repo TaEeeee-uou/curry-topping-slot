@@ -1,0 +1,1045 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>トッピングスロット</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700&family=Noto+Serif+SC:wght@500;700&family=Fraunces:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Outfit:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ink:#0C0D12;
+  --surface:#14161E;
+  --surface-2:#1B1E29;
+  --surface-3:#232733;
+  --text:#F4F1EA;
+  --muted:#8B8F9B;
+  --faint:#5A5E6A;
+  --line:rgba(244,241,234,.08);
+  --line-2:rgba(244,241,234,.16);
+  --accent:#F2B544;
+  --accent-soft:rgba(242,181,68,.16);
+  --font-serif:'Shippori Mincho B1','Fraunces','Hiragino Mincho ProN','Yu Mincho',serif;
+  --font-sans:'Zen Kaku Gothic New','Hiragino Sans','Noto Sans JP',sans-serif;
+  --font-latin:'Outfit','Zen Kaku Gothic New',sans-serif;
+  --row:82px;
+  --reels:3;
+  color-scheme:dark;
+}
+html[lang="zh"]{--font-serif:'Noto Serif SC','Fraunces','PingFang SC','Songti SC',serif;--font-sans:'Zen Kaku Gothic New','PingFang SC','Microsoft YaHei',sans-serif}
+html[lang="en"],html[lang="ms"]{--font-serif:'Fraunces','Shippori Mincho B1',Georgia,serif}
+@media (min-width:600px){ :root{--row:96px} }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--ink);
+  background-image:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(242,181,68,.10), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(127,182,230,.06), transparent 70%);
+  color:var(--text);
+  font-family:var(--font-sans);
+  font-size:15px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button,input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+/* ---- header ---- */
+.top{
+  max-width:680px;margin:0 auto;
+  padding:calc(22px + env(safe-area-inset-top)) 22px 4px;
+  display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;
+}
+.eyebrow{
+  display:block;font-family:var(--font-latin);font-size:11px;font-weight:500;letter-spacing:.28em;
+  color:var(--accent);text-transform:uppercase;
+}
+h1{
+  font-family:var(--font-serif);font-weight:500;
+  font-size:clamp(24px,5.5vw,32px);line-height:1.2;
+  margin:6px 0 0;letter-spacing:.06em;text-wrap:balance;
+}
+.actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{
+  appearance:none;border:1px solid var(--line-2);background:transparent;
+  color:var(--text);border-radius:999px;padding:8px 15px;font-size:13px;font-weight:500;
+  cursor:pointer;letter-spacing:.04em;transition:background .15s,border-color .15s,opacity .15s,color .15s;
+}
+.btn:hover{background:rgba(244,241,234,.06);border-color:rgba(244,241,234,.3)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:700}
+.btn.primary:hover{background:#f7c25f}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--text);background:rgba(244,241,234,.05)}
+.btn.danger{color:#f28b7d;border-color:rgba(240,138,122,.3)}
+.btn.danger:hover{background:rgba(240,138,122,.12)}
+.btn[aria-pressed="false"]{color:var(--faint);text-decoration:line-through}
+.sel{
+  appearance:none;-webkit-appearance:none;border:1px solid var(--line-2);background:transparent;
+  color:var(--text);border-radius:999px;padding:8px 30px 8px 14px;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:.02em;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%238B8F9B' stroke-width='1.5'/></svg>");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.sel:hover{border-color:rgba(244,241,234,.3)}
+.sel option{background:var(--surface);color:var(--text)}
+
+/* ---- stage ---- */
+.stage{
+  max-width:680px;margin:0 auto;
+  padding:14px 18px calc(40px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;align-items:center;gap:22px;
+}
+
+/* ---- cabinet ---- */
+.cabinet{
+  width:min(100%,600px);
+  background:linear-gradient(180deg,var(--surface-2) 0%,var(--surface) 100%);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:22px 18px 20px;
+  box-shadow:0 40px 90px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.05);
+  margin-top:10px;
+  position:relative;
+  transition:box-shadow .5s;
+}
+.cabinet.tense{box-shadow:0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(242,181,68,.25), 0 0 60px rgba(242,181,68,.12), inset 0 1px 0 rgba(255,255,255,.05)}
+
+.reels{
+  position:relative;
+  display:grid;grid-template-columns:repeat(var(--reels),minmax(0,1fr));gap:10px;
+}
+.reels::before,.reels::after{
+  content:"";position:absolute;top:calc(var(--row) * 1.5 - 5px);width:0;height:0;z-index:4;
+  border-top:5px solid transparent;border-bottom:5px solid transparent;
+}
+.reels::before{left:-13px;border-left:7px solid var(--accent)}
+.reels::after{right:-13px;border-right:7px solid var(--accent)}
+
+.reel{
+  position:relative;height:calc(var(--row) * 3);overflow:hidden;
+  border-radius:18px;background:var(--ink);
+  border:1px solid var(--line);
+  box-shadow:inset 0 18px 30px rgba(0,0,0,.7), inset 0 -18px 30px rgba(0,0,0,.7);
+  cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;
+  transition:box-shadow .4s,border-color .4s;
+}
+.reel.done{cursor:default}
+.reel.tense{border-color:rgba(242,181,68,.5);box-shadow:inset 0 18px 30px rgba(0,0,0,.7), inset 0 -18px 30px rgba(0,0,0,.7), 0 0 30px rgba(242,181,68,.25);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:inset 0 18px 30px rgba(0,0,0,.7), inset 0 -18px 30px rgba(0,0,0,.7), 0 0 50px rgba(242,181,68,.45)}}
+.strip{position:absolute;left:0;right:0;top:0;will-change:transform}
+.reel.fast .strip{filter:blur(.7px)}
+.row{height:var(--row);padding:4px 7px}
+.row>span{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  height:100%;width:100%;border-radius:12px;padding:2px 6px;
+  font-family:var(--font-serif);font-weight:700;line-height:1.2;
+  font-size:20px;letter-spacing:.04em;
+  color:var(--c);
+  background:color-mix(in srgb, var(--c) 10%, var(--surface-2));
+  border:1px solid color-mix(in srgb, var(--c) 22%, transparent);
+  overflow-wrap:break-word;text-wrap:balance;
+  transition:background .35s,color .35s,box-shadow .35s,transform .35s;
+}
+.row>span.m{font-size:17px}
+.row>span.s{font-size:14px;letter-spacing:.01em}
+.row>span.xs{font-size:12.5px;letter-spacing:0;line-height:1.15}
+@media (max-width:599px){
+  .reels[data-count="4"] .row>span{font-size:15px;letter-spacing:.01em}
+  .reels[data-count="4"] .row>span.m{font-size:13px}
+  .reels[data-count="4"] .row>span.s{font-size:11.5px}
+  .reels[data-count="4"] .row>span.xs{font-size:10.5px}
+}
+@media (min-width:600px){
+  .row>span{font-size:23px}
+  .row>span.m{font-size:19px}
+  .row>span.s{font-size:16px}
+  .row>span.xs{font-size:14px}
+}
+.row.win>span{
+  background:var(--c);color:var(--ink);border-color:transparent;
+  box-shadow:0 0 0 1px rgba(255,255,255,.15) inset, 0 6px 30px color-mix(in srgb, var(--c) 45%, transparent);
+  transform:scale(1.03);
+}
+.reel::before,.reel::after{
+  content:"";position:absolute;left:0;right:0;height:calc(var(--row) * .95);pointer-events:none;z-index:2;
+}
+.reel::before{top:0;background:linear-gradient(180deg,rgba(12,13,18,.95),rgba(12,13,18,0))}
+.reel::after{bottom:0;background:linear-gradient(0deg,rgba(12,13,18,.95),rgba(12,13,18,0))}
+
+.reel-tools{
+  display:grid;grid-template-columns:repeat(var(--reels),minmax(0,1fr));gap:10px;margin-top:10px;min-height:28px;
+}
+.reel-tools .btn{
+  padding:4px 4px;font-size:11.5px;white-space:nowrap;letter-spacing:.04em;
+  border-color:transparent;color:var(--muted);width:100%;overflow:hidden;text-overflow:ellipsis;
+}
+.reel-tools .btn:hover{color:var(--text);background:rgba(244,241,234,.05)}
+.reel-tools .btn:disabled{opacity:.35;color:var(--muted);background:transparent}
+
+.controls{display:flex;justify-content:center;margin-top:14px}
+.start{
+  appearance:none;cursor:pointer;
+  min-width:min(100%,280px);padding:15px 36px;border-radius:999px;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:var(--ink);font-family:var(--font-sans);font-weight:700;font-size:17px;letter-spacing:.2em;
+  box-shadow:0 10px 30px rgba(242,181,68,.25);
+  transition:transform .12s,box-shadow .2s,background .2s,color .2s;
+}
+html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);letter-spacing:.22em;font-size:16px}
+.start:hover{background:#f7c25f;transform:translateY(-1px);box-shadow:0 14px 34px rgba(242,181,68,.32)}
+.start:active{transform:translateY(1px)}
+.start.stop{background:transparent;color:var(--accent);box-shadow:none}
+.start.stop:hover{background:var(--accent-soft)}
+.start:disabled{opacity:.45;cursor:default;transform:none}
+
+.hint{
+  margin:0;text-align:center;font-size:13.5px;color:var(--muted);
+  min-height:1.7em;text-wrap:balance;letter-spacing:.02em;max-width:560px;
+}
+.hint strong{color:var(--text);font-weight:500}
+
+/* ---- outcome ---- */
+.outcome{
+  width:min(100%,600px);text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  animation:rise .5s cubic-bezier(.2,1,.3,1) both;
+}
+@keyframes rise{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.picks{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:6px 14px;
+  font-family:var(--font-serif);font-weight:700;font-size:clamp(24px,6.4vw,38px);line-height:1.2;letter-spacing:.04em;
+}
+.picks .pk{color:var(--c);overflow-wrap:break-word}
+.picks .x{color:var(--faint);font-family:var(--font-latin);font-weight:400;font-size:.55em}
+.tag{margin:0;color:var(--muted);font-size:13.5px;letter-spacing:.04em}
+.outcome .row-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+.outcome .btn{padding:11px 22px;font-size:14px}
+
+.meta{
+  display:flex;gap:18px;align-items:center;font-size:12px;color:var(--muted);letter-spacing:.06em;
+  font-variant-numeric:tabular-nums;
+}
+.meta b{color:var(--text);font-weight:500;font-size:14px;font-family:var(--font-latin)}
+.last{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;font-size:12px;color:var(--muted);max-width:600px}
+.chip{
+  display:inline-block;padding:3px 11px;border-radius:999px;
+  border:1px solid var(--line-2);color:var(--text);font-size:12px;letter-spacing:.03em;
+}
+
+/* ---- confetti ---- */
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:15}
+
+/* ---- settings drawer ---- */
+.scrim{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+.panel{
+  position:fixed;top:0;right:0;bottom:0;z-index:31;
+  width:min(100%,420px);background:var(--surface);
+  border-left:1px solid var(--line);
+  display:flex;flex-direction:column;
+  animation:slide .3s cubic-bezier(.2,.9,.3,1) both;
+  box-shadow:-30px 0 80px rgba(0,0,0,.5);
+}
+@keyframes slide{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+.panel header{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:calc(18px + env(safe-area-inset-top)) 20px 14px;border-bottom:1px solid var(--line);
+}
+.panel h2{font-family:var(--font-serif);font-weight:500;font-size:18px;margin:0;letter-spacing:.06em}
+.field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px 4px;font-size:14px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;padding:3px;gap:2px}
+.seg button{
+  appearance:none;border:0;background:transparent;color:var(--muted);
+  border-radius:999px;padding:5px 14px;font-size:13px;font-weight:500;cursor:pointer;
+  font-variant-numeric:tabular-nums;transition:background .15s,color .15s;
+}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--ink);font-weight:700}
+.panel form{display:flex;gap:8px;padding:12px 20px 6px}
+.panel input[type=text]{
+  flex:1;min-width:0;border:1px solid var(--line-2);background:var(--ink);
+  color:var(--text);border-radius:12px;padding:10px 13px;font-size:15px;
+}
+.panel input[type=text]::placeholder{color:var(--faint)}
+.panel input[type=text]:focus{outline:none;border-color:var(--accent)}
+.list{list-style:none;margin:0;padding:6px 12px 10px;overflow-y:auto;flex:1}
+.list li{border-radius:12px}
+.list li:hover{background:rgba(244,241,234,.04)}
+.list .main{display:flex;align-items:center;gap:10px;padding:9px 8px}
+.list li.off .nm{color:var(--faint);text-decoration:line-through}
+.list label{display:flex;align-items:center;gap:12px;flex:1;cursor:pointer;min-width:0}
+.list input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent);cursor:pointer;flex:none}
+.nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;letter-spacing:.02em}
+.sw{width:10px;height:10px;border-radius:50%;flex:none}
+.mini{
+  appearance:none;border:0;background:transparent;color:var(--faint);
+  font-size:12px;padding:6px 8px;border-radius:8px;cursor:pointer;white-space:nowrap;
+}
+.mini:hover{color:var(--text);background:rgba(244,241,234,.06)}
+.mini.del:hover{color:#f28b7d;background:rgba(240,138,122,.12)}
+.mini[aria-expanded="true"]{color:var(--accent)}
+.tr{
+  display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;
+  padding:4px 10px 12px 40px;font-size:12px;color:var(--muted);
+}
+.tr input{
+  border:1px solid var(--line-2);background:var(--ink);color:var(--text);
+  border-radius:9px;padding:6px 10px;font-size:14px;min-width:0;width:100%;
+}
+.tr input:focus{outline:none;border-color:var(--accent)}
+.panel footer{
+  display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;
+  padding:12px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);
+}
+.msg{padding:0 20px;font-size:12px;color:var(--muted);min-height:1.7em}
+
+@media (prefers-reduced-motion: reduce){
+  .outcome,.panel,.reel.tense{animation:none}
+  .reel.fast .strip{filter:none}
+  .row>span{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <span class="eyebrow">Topping Slot</span>
+    <h1 data-t="title">トッピングスロット</h1>
+  </div>
+  <div class="actions">
+    <select class="sel" id="langSel" aria-label="Language">
+      <option value="ja">日本語</option>
+      <option value="zh">中文</option>
+      <option value="en">English</option>
+      <option value="ms">Bahasa Melayu</option>
+    </select>
+    <button class="btn ghost" id="soundBtn" aria-pressed="true" data-t="sound">効果音</button>
+    <button class="btn" id="settingsBtn" data-t="edit">トッピングを編集</button>
+  </div>
+</header>
+
+<main class="stage">
+  <section class="cabinet" id="cabinet">
+    <div class="reels" id="reels"></div>
+    <div class="reel-tools" id="reelTools"></div>
+    <div class="controls">
+      <button class="start" id="startBtn">スタート</button>
+    </div>
+  </section>
+
+  <p class="hint" id="hint"></p>
+
+  <section class="outcome" id="outcome" hidden aria-live="polite">
+    <span class="eyebrow" data-t="today">今日のトッピング</span>
+    <div class="picks" id="picks"></div>
+    <p class="tag" id="tag"></p>
+    <div class="row-btns">
+      <button class="btn" id="againBtn" data-t="again">もう一回</button>
+      <button class="btn primary" id="okBtn" data-t="ok">これにする</button>
+    </div>
+  </section>
+
+  <div class="meta" id="meta"></div>
+  <div class="last" id="last" hidden></div>
+</main>
+
+<canvas id="confetti" hidden></canvas>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="panel" id="panel" hidden>
+  <header>
+    <h2 data-t="edit">トッピングを編集</h2>
+    <button class="btn ghost" id="closeBtn" data-t="close">閉じる</button>
+  </header>
+  <div class="field">
+    <span data-t="howMany">選ぶ数</span>
+    <div class="seg" id="reelSeg" role="group">
+      <button data-r="2" aria-pressed="false">2</button>
+      <button data-r="3" aria-pressed="true">3</button>
+      <button data-r="4" aria-pressed="false">4</button>
+    </div>
+  </div>
+  <form id="addForm">
+    <input type="text" id="addInput" maxlength="24" autocomplete="off">
+    <button class="btn primary" type="submit" data-t="add">追加</button>
+  </form>
+  <p class="msg" id="msg"></p>
+  <ul class="list" id="list"></ul>
+  <footer>
+    <span data-t="noDup">同じトッピングは重複しません</span>
+    <div style="display:flex;gap:6px">
+      <button class="btn ghost" id="allOnBtn" data-t="allOn">すべてON</button>
+      <button class="btn danger" id="resetBtn" data-t="reset">はじめの候補に戻す</button>
+    </div>
+  </footer>
+</aside>
+
+<script>
+(() => {
+  'use strict';
+  const LANGS = ['ja', 'zh', 'en', 'ms'];
+  const LANG_NAME = { ja: '日本語', zh: '中文', en: 'English', ms: 'Bahasa Melayu' };
+  const DEFAULT = [
+    { ja: 'チキン',         zh: '鸡肉',     en: 'Chicken',        ms: 'Ayam' },
+    { ja: 'サーモン',       zh: '三文鱼',   en: 'Salmon',         ms: 'Salmon' },
+    { ja: '角煮',           zh: '红烧肉',   en: 'Kakuni',         ms: 'Kakuni' },
+    { ja: 'ホタテ',         zh: '扇贝',     en: 'Scallop',        ms: 'Skalop' },
+    { ja: 'エビ',           zh: '虾',       en: 'Shrimp',         ms: 'Udang' },
+    { ja: 'たまご',         zh: '鸡蛋',     en: 'Egg',            ms: 'Telur' },
+    { ja: 'コーン',         zh: '玉米',     en: 'Corn',           ms: 'Jagung' },
+    { ja: 'チーズ',         zh: '芝士',     en: 'Cheese',         ms: 'Keju' },
+    { ja: 'バター',         zh: '黄油',     en: 'Butter',         ms: 'Mentega' },
+    { ja: 'かぼちゃ',       zh: '南瓜',     en: 'Pumpkin',        ms: 'Labu' },
+    { ja: 'オクラ',         zh: '秋葵',     en: 'Okra',           ms: 'Bendi' },
+    { ja: 'なす',           zh: '茄子',     en: 'Eggplant',       ms: 'Terung' },
+    { ja: 'ほうれん草',     zh: '菠菜',     en: 'Spinach',        ms: 'Bayam' },
+    { ja: '玉ねぎ',         zh: '洋葱',     en: 'Onion',          ms: 'Bawang' },
+    { ja: 'じゃがいも',     zh: '土豆',     en: 'Potato',         ms: 'Kentang' },
+    { ja: 'パプリカ',       zh: '彩椒',     en: 'Bell pepper',    ms: 'Lada benggala' },
+    { ja: 'アスパラ',       zh: '芦笋',     en: 'Asparagus',      ms: 'Asparagus' },
+    { ja: 'ガーリック',     zh: '蒜',       en: 'Garlic',         ms: 'Bawang putih' },
+    { ja: 'ローストオニオン', zh: '烤洋葱', en: 'Roasted onion',  ms: 'Bawang bakar' },
+    { ja: 'カツ',           zh: '炸猪排',   en: 'Pork cutlet',    ms: 'Katsu' },
+    { ja: '唐揚げ',         zh: '炸鸡块',   en: 'Karaage',        ms: 'Karaage' },
+    { ja: 'うずら',         zh: '鹌鹑蛋',   en: 'Quail eggs',     ms: 'Telur puyuh' },
+    { ja: '揚げのり',       zh: '炸海苔',   en: 'Fried seaweed',  ms: 'Rumpai laut goreng' },
+    { ja: 'ポテト',         zh: '薯条',     en: 'Fries',          ms: 'Kentang goreng' },
+    { ja: 'ソーセージ',     zh: '香肠',     en: 'Sausage',        ms: 'Sosej' },
+    { ja: 'トマト',         zh: '番茄',     en: 'Tomato',         ms: 'Tomato' },
+    { ja: 'エビフライ',     zh: '炸虾',     en: 'Fried shrimp',   ms: 'Udang goreng' },
+    { ja: 'うどん',         zh: '乌冬面',   en: 'Udon',           ms: 'Udon' },
+    { ja: 'ラーメン',       zh: '拉面',     en: 'Ramen',          ms: 'Ramen' },
+    { ja: 'ハンバーグ',     zh: '汉堡肉饼', en: 'Hamburg steak',  ms: 'Hamburg' },
+    { ja: 'しゃぶしゃぶ',   zh: '涮肉',     en: 'Shabu-shabu',    ms: 'Shabu-shabu' },
+  ];
+  const STR = {
+    ja: {
+      title: 'トッピングスロット', sound: '効果音', edit: 'トッピングを編集', close: '閉じる',
+      start: 'スタート', stop: 'ストップ', respin: '回し直す',
+      hintIdle: 'スタートを押すと <strong>{n}つ</strong> のトッピングが決まります',
+      hintSpin: 'ストップを押すたびに左から1列ずつ止まります。列を直接タップしても止まります',
+      hintTense: '最後の1列…', hintCount: 'あと <strong>{s}秒</strong> で自動で止まります',
+      hintReroll: 'ストップを押すか、列をタップすると止まります',
+      hintDone: '気に入らない列は「回し直す」で変えられます',
+      hintNeed: '候補を <strong>{n}つ以上</strong> ONにしてください（今は{c}つ）',
+      hintNoOther: 'ほかに選べるトッピングがありません',
+      hintDecided: '決定。<strong>{set}</strong> をどうぞ',
+      today: '今日のトッピング', again: 'もう一回', ok: 'これにする', earlier: 'これまで',
+      meta: '候補 <b>{n}</b> 種', howMany: '選ぶ数', countN: '{n}つ',
+      addPh: '追加するトッピング名', add: '追加',
+      msgDefault: 'チェックを外すとスロットから外れます。最大{max}種まで。',
+      msgMax: 'トッピングは最大{max}種までです', msgDup: '「{name}」はもう入っています',
+      msgAdded: '「{name}」を追加しました。ほかの言語名は「翻訳」から入れられます', msgReset: 'はじめの候補に戻しました',
+      noDup: '同じトッピングは重複しません', allOn: 'すべてON', reset: 'はじめの候補に戻す',
+      confirmReset: 'トッピングをはじめの{n}種に戻します。よろしいですか？',
+      del: '削除', delAria: '{name}を削除', translate: '翻訳', none: '候補なし',
+      reelAria: '{i}列目。回っているときにタップすると止まります', lang: '言語',
+      tags: ['いい組み合わせです', '店主も好きな組み合わせ', '今日はこれで決まり', '迷ったときの正解', '攻めた組み合わせ、いいですね', 'スパイスと相性よし'],
+    },
+    zh: {
+      title: '配料老虎机', sound: '音效', edit: '编辑配料', close: '关闭',
+      start: '开始', stop: '停止', respin: '重转',
+      hintIdle: '按开始，随机选出 <strong>{n} 种</strong> 配料',
+      hintSpin: '每按一次停止，从左到右停一列。也可以直接点击该列',
+      hintTense: '最后一列…', hintCount: '还有 <strong>{s} 秒</strong> 自动停止',
+      hintReroll: '按停止或点击该列即可停止',
+      hintDone: '不满意的列可以点“重转”更换',
+      hintNeed: '请至少开启 <strong>{n} 种</strong> 配料（当前 {c} 种）',
+      hintNoOther: '没有其他可选配料',
+      hintDecided: '已选定：<strong>{set}</strong>',
+      today: '今日配料', again: '再来一次', ok: '就这些', earlier: '之前',
+      meta: '共 <b>{n}</b> 种配料', howMany: '选择数量', countN: '{n} 种',
+      addPh: '输入新配料名称', add: '添加',
+      msgDefault: '取消勾选即从老虎机中移除。最多 {max} 种。',
+      msgMax: '最多只能添加 {max} 种配料', msgDup: '“{name}”已经存在',
+      msgAdded: '已添加“{name}”。其他语言名称可在“翻译”中填写', msgReset: '已恢复为默认配料',
+      noDup: '同一配料不会重复出现', allOn: '全部开启', reset: '恢复默认',
+      confirmReset: '将恢复为默认的 {n} 种配料，确定吗？',
+      del: '删除', delAria: '删除{name}', translate: '翻译', none: '无配料',
+      reelAria: '第 {i} 列。转动时点击即可停止', lang: '语言',
+      tags: ['很不错的搭配', '店主也喜欢这个组合', '今天就选这个', '纠结时的正确答案', '很大胆的搭配，不错', '和香料很搭'],
+    },
+    en: {
+      title: 'Topping Slot', sound: 'Sound', edit: 'Edit toppings', close: 'Close',
+      start: 'START', stop: 'STOP', respin: 'Respin',
+      hintIdle: 'Press start to pick <strong>{n} toppings</strong>',
+      hintSpin: 'Each press of stop halts one reel, left to right. Tap a reel to stop it directly',
+      hintTense: 'Last reel…', hintCount: 'Stops automatically in <strong>{s}s</strong>',
+      hintReroll: 'Press stop or tap the reel to stop it',
+      hintDone: 'Not keen on one? Use “Respin” under that reel',
+      hintNeed: 'Turn on at least <strong>{n} toppings</strong> ({c} now)',
+      hintNoOther: 'No other toppings available',
+      hintDecided: 'Done. Enjoy <strong>{set}</strong>',
+      today: "Today's toppings", again: 'Again', ok: 'Go with these', earlier: 'Earlier',
+      meta: '<b>{n}</b> toppings', howMany: 'How many', countN: '{n}',
+      addPh: 'New topping name', add: 'Add',
+      msgDefault: 'Uncheck to leave one out. Up to {max} toppings.',
+      msgMax: 'Up to {max} toppings only', msgDup: '“{name}” is already in the list',
+      msgAdded: 'Added “{name}”. Other languages can be set under “Translations”', msgReset: 'Reset to the default toppings',
+      noDup: 'No topping appears twice', allOn: 'All on', reset: 'Reset to defaults',
+      confirmReset: 'Reset to the default {n} toppings?',
+      del: 'Delete', delAria: 'Delete {name}', translate: 'Translations', none: 'No toppings',
+      reelAria: 'Reel {i}. Tap while spinning to stop it', lang: 'Language',
+      tags: ['A fine combination', 'One of the owner’s favourites', 'That settles today’s curry', 'The right call when in doubt', 'Bold choice, we like it', 'Pairs well with the spices'],
+    },
+    ms: {
+      title: 'Slot Topping', sound: 'Bunyi', edit: 'Sunting topping', close: 'Tutup',
+      start: 'MULA', stop: 'BERHENTI', respin: 'Putar semula',
+      hintIdle: 'Tekan mula untuk memilih <strong>{n} topping</strong>',
+      hintSpin: 'Setiap tekan berhenti menghentikan satu gulungan dari kiri. Ketik gulungan untuk menghentikannya terus',
+      hintTense: 'Gulungan terakhir…', hintCount: 'Berhenti sendiri dalam <strong>{s}s</strong>',
+      hintReroll: 'Tekan berhenti atau ketik gulungan untuk berhenti',
+      hintDone: 'Tak suka? Tekan “Putar semula” di bawah gulungan itu',
+      hintNeed: 'Hidupkan sekurang-kurangnya <strong>{n} topping</strong> (kini {c})',
+      hintNoOther: 'Tiada topping lain tersedia',
+      hintDecided: 'Selesai. Nikmati <strong>{set}</strong>',
+      today: 'Topping hari ini', again: 'Sekali lagi', ok: 'Pilih ini', earlier: 'Sebelumnya',
+      meta: '<b>{n}</b> topping', howMany: 'Bilangan', countN: '{n}',
+      addPh: 'Nama topping baharu', add: 'Tambah',
+      msgDefault: 'Nyahtanda untuk keluarkan. Maksimum {max} topping.',
+      msgMax: 'Maksimum {max} topping sahaja', msgDup: '“{name}” sudah ada dalam senarai',
+      msgAdded: '“{name}” ditambah. Nama bahasa lain boleh diisi di “Terjemahan”', msgReset: 'Ditetapkan semula kepada topping lalai',
+      noDup: 'Topping tidak berulang', allOn: 'Hidupkan semua', reset: 'Set semula',
+      confirmReset: 'Set semula kepada {n} topping lalai?',
+      del: 'Padam', delAria: 'Padam {name}', translate: 'Terjemahan', none: 'Tiada topping',
+      reelAria: 'Gulungan {i}. Ketik semasa berputar untuk berhenti', lang: 'Bahasa',
+      tags: ['Gabungan yang sedap', 'Kegemaran tuan kedai juga', 'Kari hari ini dah tetap', 'Pilihan tepat bila keliru', 'Pilihan berani, kami suka', 'Serasi dengan rempah'],
+    },
+  };
+  const KEY = 'curry-slot.v2';
+  const OLD_KEY = 'curry-slot.v1';
+  const MAX = 40;
+  const PALETTE = ['#F2C46B', '#F08A7A', '#8CC9A9', '#7FB6E6', '#C4A6E8', '#EFA5C8', '#9EDDD0', '#EDE2A0'];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const mod = (a, n) => ((a % n) + n) % n;
+
+  // ---- i18n ----
+  let lang = 'ja';
+  try { const v = localStorage.getItem(KEY + '.lang'); if (LANGS.includes(v)) lang = v; } catch (e) {}
+  if (!lang) lang = 'ja';
+  const t = (k, p = {}) => String(STR[lang][k] ?? STR.ja[k] ?? k).replace(/\{(\w+)\}/g, (_, x) => p[x] ?? '');
+  const nameOf = it => it.names[lang] || it.names.ja || LANGS.map(l => it.names[l]).find(Boolean) || '';
+
+  // ---- state ----
+  let items = loadItems();
+  let reelCount = loadNum(KEY + '.reels', 3, [2, 3, 4]);
+  let soundOn = true;
+  try { soundOn = localStorage.getItem(KEY + '.sound') !== 'off'; } catch (e) {}
+  let history = [];               // [[namesObj, ...], ...]
+  let reels = [];
+  let raf = 0, lastFrame = 0;
+  let rowPx = 82;
+  let hintState = { key: 'hintIdle', params: null };
+  let tagIdx = 0;
+  let openTr = -1;                // 翻訳を開いている項目
+
+  function normalize(x) {
+    if (x && typeof x === 'object' && x.names) {
+      const names = {}; LANGS.forEach(l => { if (x.names[l]) names[l] = String(x.names[l]).slice(0, 24); });
+      return Object.keys(names).length ? { names, on: x.on !== false } : null;
+    }
+    if (x && typeof x.name === 'string') {           // v1 形式
+      const d = DEFAULT.find(dd => dd.ja === x.name);
+      return { names: d ? { ...d } : { ja: x.name.slice(0, 24) }, on: x.on !== false };
+    }
+    return null;
+  }
+  function loadItems() {
+    try {
+      const raw = localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length) {
+          const out = arr.map(normalize).filter(Boolean);
+          if (out.length) return out;
+        }
+      }
+    } catch (e) {}
+    return DEFAULT.map(d => ({ names: { ...d }, on: true }));
+  }
+  function loadNum(k, def, allowed) {
+    try { const v = Number(localStorage.getItem(k)); if (allowed.includes(v)) return v; } catch (e) {}
+    return def;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(items)); } catch (e) {} }
+  const active = () => items.filter(i => i.on);
+  const colorAt = (i, n) => (n % PALETTE.length === 1 && i === n - 1) ? PALETTE[3] : PALETTE[i % PALETTE.length];
+  const units = s => [...s].reduce((a, c) => a + (/[\u2E80-\u9FFF\uF900-\uFAFF\uFF00-\uFFEF]/.test(c) ? 1 : 0.55), 0);
+  const sizeClass = name => { const u = units(name); return u >= 7 ? 'xs' : u >= 5 ? 's' : u >= 4 ? 'm' : ''; };
+
+  // ---- DOM ----
+  const $ = id => document.getElementById(id);
+  const cabinet = $('cabinet'), reelsEl = $('reels'), toolsEl = $('reelTools');
+  const startBtn = $('startBtn'), hint = $('hint'), metaEl = $('meta'), lastEl = $('last');
+  const outcome = $('outcome'), picksEl = $('picks'), tagEl = $('tag');
+  const panel = $('panel'), scrim = $('scrim'), list = $('list'), msg = $('msg');
+  const soundBtn = $('soundBtn'), settingsBtn = $('settingsBtn'), langSel = $('langSel');
+  soundBtn.setAttribute('aria-pressed', String(soundOn));
+
+  const isMoving = r => r.phase === 'spin' || r.phase === 'stop' || r.phase === 'bounce';
+  const anySpinning = () => reels.some(isMoving);
+  const allDone = () => reels.length && reels.every(r => r.phase === 'done');
+
+  function setHint(key, params) {
+    hintState = { key, params };
+    const p = params && Array.isArray(params.set) ? { ...params, set: params.set.map(it => esc(nameOf(it))).join(' × ') } : (params || {});
+    hint.innerHTML = t(key, p);
+  }
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.title = t('title');
+    langSel.value = lang;
+    langSel.setAttribute('aria-label', t('lang'));
+    document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+    cabinet.setAttribute('aria-label', t('title'));
+    panel.setAttribute('aria-label', t('edit'));
+    $('addInput').placeholder = t('addPh');
+    $('reelSeg').setAttribute('aria-label', t('howMany'));
+    $('reelSeg').querySelectorAll('button').forEach(b => { b.textContent = t('countN', { n: b.dataset.r }); });
+    startBtn.textContent = anySpinning() ? t('stop') : t('start');
+    reels.forEach(r => {
+      r.tool.textContent = t('respin');
+      r.el.setAttribute('aria-label', t('reelAria', { i: r.index + 1 }));
+    });
+    if (!msgTimer) msg.textContent = t('msgDefault', { max: MAX });
+    setHint(hintState.key, hintState.params);
+    updateMeta(); renderLast();
+    refreshIdleReels(true);
+    if (!outcome.hidden) renderPicks();
+    if (!panel.hidden) renderList();
+  }
+  langSel.addEventListener('change', () => {
+    lang = LANGS.includes(langSel.value) ? langSel.value : 'ja';
+    try { localStorage.setItem(KEY + '.lang', lang); } catch (e) {}
+    applyLang();
+  });
+
+  // ---- reels ----
+  function buildReels() {
+    document.documentElement.style.setProperty('--reels', reelCount);
+    reelsEl.dataset.count = reelCount; toolsEl.dataset.count = reelCount;
+    reelsEl.innerHTML = ''; toolsEl.innerHTML = '';
+    reels = [];
+    const list = active();
+    for (let i = 0; i < reelCount; i++) {
+      const el = document.createElement('button');
+      el.className = 'reel'; el.type = 'button';
+      el.setAttribute('aria-label', t('reelAria', { i: i + 1 }));
+      const strip = document.createElement('div'); strip.className = 'strip';
+      el.append(strip);
+      reelsEl.appendChild(el);
+      const tool = document.createElement('button');
+      tool.className = 'btn'; tool.type = 'button'; tool.textContent = t('respin'); tool.hidden = true;
+      toolsEl.appendChild(tool);
+      const r = { el, strip, tool, list: [], n: 0, pos: 0, vel: 0, phase: 'idle', bounce: 0, target: -1, lastTick: -1, index: i };
+      fillStrip(r, list);
+      r.pos = list.length ? Math.floor(Math.random() * list.length) : 0;
+      el.addEventListener('click', () => { if (r.phase === 'spin') r.stopAt = performance.now(); });
+      tool.addEventListener('click', () => reroll(r));
+      reels.push(r);
+      render(r);
+    }
+  }
+  function fillStrip(r, list) {
+    r.list = list; r.n = list.length;
+    r.strip.innerHTML = '';
+    if (!r.n) {
+      const row = document.createElement('div'); row.className = 'row';
+      const sp = document.createElement('span'); sp.style.setProperty('--c', '#8B8F9B');
+      sp.style.cssText += 'font-family:var(--font-sans);font-weight:400;font-size:13px';
+      sp.textContent = t('none'); row.appendChild(sp); r.strip.appendChild(row);
+      r.strip.style.transform = `translateY(${rowPx}px)`;
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    for (let c = 0; c < 3; c++) {
+      list.forEach((it, i) => {
+        const nm = nameOf(it);
+        const row = document.createElement('div'); row.className = 'row';
+        const sp = document.createElement('span'); sp.className = sizeClass(nm);
+        sp.style.setProperty('--c', colorAt(i, r.n));
+        sp.textContent = nm;
+        row.appendChild(sp); frag.appendChild(row);
+      });
+    }
+    r.strip.appendChild(frag);
+  }
+  function render(r) {
+    if (!r.n) return;
+    r.strip.style.transform = `translateY(${-(r.n + r.pos - 1 + r.bounce) * rowPx}px)`;
+  }
+  function markWin(r, on) {
+    r.strip.querySelectorAll('.row.win').forEach(e => e.classList.remove('win'));
+    if (on && r.target >= 0) {
+      const row = r.strip.children[r.n + r.target];
+      if (row) row.classList.add('win');
+    }
+  }
+  function refreshIdleReels(keepOutcome) {
+    if (anySpinning()) return;
+    const list = active();
+    reels.forEach(r => {
+      const keep = r.phase === 'done' && r.target >= 0 ? r.list[r.target] : null;
+      fillStrip(r, list);
+      let idx = keep ? list.indexOf(keep) : -1;
+      if (idx < 0) { idx = list.length ? Math.floor(Math.random() * list.length) : 0; setDone(r, false); }
+      r.pos = idx; r.target = idx; r.bounce = 0;
+      if (r.phase === 'done') markWin(r, true);
+      render(r);
+    });
+    if (!allDone()) outcome.hidden = true;
+    else if (!keepOutcome) renderPicks();
+    updateMeta();
+  }
+  function setDone(r, done) {
+    r.el.classList.toggle('done', done);
+    r.el.classList.remove('tense');
+    if (done) r.rerolling = false;
+    if (!done) { r.phase = 'idle'; r.target = -1; }
+    markWin(r, done);
+    updateTools();
+  }
+  // 「回し直す」ボタン: 決まった列と回し直し中の列に表示。回転中は押せない
+  function updateTools() {
+    const busy = anySpinning();
+    reels.forEach(r => { r.tool.hidden = !(r.phase === 'done' || r.rerolling); r.tool.disabled = busy; });
+  }
+
+  // ---- animation ----
+  const SPIN_V = 14;
+  const MAX_SPIN = 60000;
+  let spinStartedAt = 0;
+  function loop(now) {
+    const dt = Math.min(0.05, (now - lastFrame) / 1000); lastFrame = now;
+    let running = false;
+    for (const r of reels) {
+      if (r.phase === 'spin') {
+        r.vel = Math.min(r.vel + 22 * dt, SPIN_V);
+        r.pos = mod(r.pos + r.vel * dt, r.n);
+        r.el.classList.toggle('fast', r.vel > 7);
+        if (now >= r.stopAt) beginStop(r, now);
+        running = true;
+      } else if (r.phase === 'stop') {
+        const tt = Math.min(1, (now - r.t0) / r.dur);
+        const e = r.last ? 1 - Math.pow(1 - tt, 4) : 1 - Math.pow(1 - tt, 3);
+        r.pos = mod(r.from + (r.to - r.from) * e, r.n);
+        if (tt > 0.3) r.el.classList.remove('fast');
+        if (tt >= 1) { r.pos = mod(r.to, r.n); r.phase = 'bounce'; r.t0 = now; thunk(r.index); }
+        running = true;
+      } else if (r.phase === 'bounce') {
+        const tt = Math.min(1, (now - r.t0) / (reduceMotion ? 1 : 320));
+        r.bounce = -0.12 * Math.sin(Math.PI * tt) * (1 - tt * 0.5);
+        if (tt >= 1) { r.bounce = 0; r.phase = 'done'; setDone(r, true); }
+        running = true;
+      }
+      const cell = Math.floor(r.pos);
+      if (cell !== r.lastTick && (r.phase === 'spin' || r.phase === 'stop')) { r.lastTick = cell; tick(); }
+      render(r);
+    }
+    updateTension();
+    updateCountdown(now);
+    if (running) raf = requestAnimationFrame(loop);
+    else { raf = 0; onAllStopped(); }
+  }
+  function beginStop(r, now) {
+    r.phase = 'stop';
+    const moving = reels.filter(isMoving);
+    r.last = moving.length === 1 && reels.length > 1;
+    let d = mod(r.target - r.pos, r.n);
+    const minD = r.last ? 7 : 4;
+    while (d < minD) d += r.n;
+    r.from = r.pos; r.to = r.pos + d; r.t0 = now;
+    const base = d * 3 / SPIN_V * 1000;
+    r.dur = reduceMotion ? 250 : Math.max(r.last ? 1400 : 800, Math.min(r.last ? 2200 : 1400, base * (r.last ? 1.2 : 1)));
+  }
+  function updateTension() {
+    const moving = reels.filter(isMoving);
+    const tense = moving.length === 1 && reels.length > 1 && moving[0].phase === 'stop' && moving[0].last;
+    cabinet.classList.toggle('tense', tense);
+    reels.forEach(r => r.el.classList.toggle('tense', tense && r === moving[0]));
+    if (tense && hintState.key !== 'hintTense') setHint('hintTense');
+  }
+  function updateCountdown(now) {
+    if (!spinStartedAt || !reels.some(r => r.phase === 'spin')) return;
+    const left = Math.max(0, Math.ceil((spinStartedAt + MAX_SPIN - now) / 1000));
+    if (left <= 10 && hintState.key !== 'hintTense' && (hintState.key !== 'hintCount' || hintState.params.s !== left)) setHint('hintCount', { s: left });
+  }
+  function stopNext() { const r = reels.find(x => x.phase === 'spin'); if (r) r.stopAt = performance.now(); }
+  function startLoop() { if (!raf) { lastFrame = performance.now(); raf = requestAnimationFrame(loop); } }
+  function pickTargets(n, count, exclude) {
+    const pool = []; for (let i = 0; i < n; i++) if (!exclude.includes(i)) pool.push(i);
+    for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+    return pool.slice(0, count);
+  }
+
+  function start() {
+    if (anySpinning()) { stopNext(); return; }
+    const snapshot = active();
+    if (snapshot.length < reelCount) { setHint('hintNeed', { n: reelCount, c: snapshot.length }); openPanel(); return; }
+    ensureAudio();
+    outcome.hidden = true; stopConfetti();
+    const targets = pickTargets(snapshot.length, reelCount, []);
+    const now = performance.now();
+    reels.forEach((r, i) => {
+      fillStrip(r, snapshot);
+      setDone(r, false);
+      r.phase = 'spin'; r.vel = 2; r.target = targets[i]; r.bounce = 0; r.lastTick = -1; r.last = false;
+      r.stopAt = now + MAX_SPIN + i * 500;
+    });
+    updateTools();
+    spinStartedAt = now;
+    startBtn.textContent = t('stop'); startBtn.classList.add('stop');
+    settingsBtn.disabled = true;
+    setHint('hintSpin');
+    startLoop();
+  }
+  function reroll(r) {
+    if (anySpinning() || r.phase !== 'done') return;
+    const others = reels.filter(x => x !== r).map(x => x.target);
+    const cand = pickTargets(r.n, 1, others.concat([r.target]));
+    if (!cand.length) { setHint('hintNoOther'); return; }
+    ensureAudio();
+    outcome.hidden = true;
+    r.rerolling = true;
+    setDone(r, false);
+    r.phase = 'spin'; r.vel = 5; r.target = cand[0]; r.bounce = 0; r.lastTick = -1; r.last = false;
+    r.stopAt = performance.now() + MAX_SPIN;
+    updateTools();
+    spinStartedAt = performance.now();
+    settingsBtn.disabled = true;
+    startBtn.textContent = t('stop'); startBtn.classList.add('stop');
+    setHint('hintReroll');
+    startLoop();
+  }
+  function onAllStopped() {
+    cabinet.classList.remove('tense');
+    reels.forEach(r => r.el.classList.remove('fast', 'tense'));
+    startBtn.textContent = t('start'); startBtn.classList.remove('stop'); startBtn.disabled = false;
+    settingsBtn.disabled = false;
+    spinStartedAt = 0;
+    updateTools();
+    if (!allDone()) return;
+    tagIdx = Math.floor(Math.random() * STR[lang].tags.length);
+    renderPicks();
+    outcome.hidden = false;
+    setHint('hintDone');
+    fanfare(); confetti();
+  }
+  function renderPicks() {
+    picksEl.innerHTML = '';
+    reels.forEach((r, i) => {
+      if (i) { const x = document.createElement('span'); x.className = 'x'; x.textContent = '×'; picksEl.appendChild(x); }
+      const s = document.createElement('span'); s.className = 'pk';
+      s.style.setProperty('--c', colorAt(r.target, r.n));
+      s.textContent = nameOf(r.list[r.target]); picksEl.appendChild(s);
+    });
+    const tags = STR[lang].tags; tagEl.textContent = tags[tagIdx % tags.length];
+  }
+  $('againBtn').addEventListener('click', start);
+  $('okBtn').addEventListener('click', () => {
+    const set = reels.map(r => r.list[r.target]);
+    history.unshift(set); history = history.slice(0, 4);
+    renderLast();
+    setHint('hintDecided', { set });
+    outcome.hidden = true; stopConfetti();
+  });
+  startBtn.addEventListener('click', start);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !panel.hidden) closePanel();
+    if (e.key === ' ' && panel.hidden && !['INPUT', 'BUTTON', 'SELECT'].includes(document.activeElement.tagName)) { e.preventDefault(); start(); }
+  });
+  function renderLast() {
+    if (!history.length) { lastEl.hidden = true; return; }
+    lastEl.hidden = false;
+    lastEl.innerHTML = esc(t('earlier')) + ' ' + history.map(set => `<span class="chip">${set.map(it => esc(nameOf(it))).join(' × ')}</span>`).join('');
+  }
+
+  // ---- sound ----
+  let ac = null, lastTickAt = 0;
+  function ensureAudio() {
+    if (!soundOn) return null;
+    try {
+      if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+      if (ac.state === 'suspended') ac.resume();
+      return ac;
+    } catch (e) { return null; }
+  }
+  function tick() {
+    const a = ensureAudio(); if (!a) return;
+    const now = a.currentTime;
+    if (now - lastTickAt < 0.045) return; lastTickAt = now;
+    const o = a.createOscillator(), g = a.createGain(), f = a.createBiquadFilter();
+    o.type = 'triangle'; o.frequency.setValueAtTime(2200, now); o.frequency.exponentialRampToValueAtTime(1200, now + 0.03);
+    f.type = 'highpass'; f.frequency.value = 900;
+    g.gain.setValueAtTime(0.05, now); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+    o.connect(f).connect(g).connect(a.destination); o.start(now); o.stop(now + 0.05);
+  }
+  const NOTES = [329.63, 392.0, 493.88, 587.33];
+  function thunk(i) {
+    const a = ensureAudio(); if (!a) return;
+    const now = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(180, now); o.frequency.exponentialRampToValueAtTime(70, now + 0.14);
+    g.gain.setValueAtTime(0.16, now); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+    o.connect(g).connect(a.destination); o.start(now); o.stop(now + 0.2);
+    const o2 = a.createOscillator(), g2 = a.createGain();
+    o2.type = 'sine'; o2.frequency.value = NOTES[i % NOTES.length] * 2;
+    g2.gain.setValueAtTime(0.0001, now); g2.gain.exponentialRampToValueAtTime(0.08, now + 0.01); g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+    o2.connect(g2).connect(a.destination); o2.start(now); o2.stop(now + 0.75);
+  }
+  function fanfare() {
+    const a = ensureAudio(); if (!a) return;
+    const base = a.currentTime + 0.12;
+    [659.25, 783.99, 987.77, 1318.5].forEach((f, i) => {
+      const o = a.createOscillator(), g = a.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      const s = base + i * 0.09;
+      g.gain.setValueAtTime(0.0001, s); g.gain.exponentialRampToValueAtTime(0.09, s + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, s + (i === 3 ? 1.2 : 0.5));
+      o.connect(g).connect(a.destination); o.start(s); o.stop(s + 1.3);
+    });
+  }
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    try { localStorage.setItem(KEY + '.sound', soundOn ? 'on' : 'off'); } catch (e) {}
+    if (soundOn) { lastTickAt = 0; tick(); }
+  });
+
+  // ---- confetti ----
+  const cf = $('confetti'), cctx = cf.getContext('2d');
+  let parts = [], cfRaf = 0;
+  function confetti() {
+    if (reduceMotion) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cf.hidden = false;
+    const W = innerWidth, H = innerHeight;
+    cf.width = W * dpr; cf.height = H * dpr; cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cols = PALETTE.concat(['#F2B544', '#F4F1EA']);
+    const rect = cabinet.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height * 0.5;
+    parts = Array.from({ length: 90 }, () => ({
+      x: cx + (Math.random() - 0.5) * rect.width * 0.7, y: cy,
+      vx: (Math.random() - 0.5) * 14, vy: -8 - Math.random() * 10,
+      r: 3 + Math.random() * 4, a: Math.random() * 6.28, va: (Math.random() - 0.5) * 0.25,
+      c: cols[Math.floor(Math.random() * cols.length)], life: 1
+    }));
+    const t0 = performance.now();
+    cancelAnimationFrame(cfRaf);
+    function step(now) {
+      const tt = (now - t0) / 1000;
+      cctx.clearRect(0, 0, W, H);
+      for (const p of parts) {
+        p.vy += 0.32; p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.a += p.va;
+        p.life = Math.max(0, 1 - Math.max(0, tt - 1.5) / 0.9);
+        cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.a); cctx.globalAlpha = p.life;
+        cctx.fillStyle = p.c; cctx.fillRect(-p.r / 2, -p.r / 3, p.r, p.r * 0.66); cctx.restore();
+      }
+      if (tt < 2.5) cfRaf = requestAnimationFrame(step); else stopConfetti();
+    }
+    cfRaf = requestAnimationFrame(step);
+  }
+  function stopConfetti() { cancelAnimationFrame(cfRaf); cctx.clearRect(0, 0, cf.width, cf.height); cf.hidden = true; }
+
+  // ---- settings panel ----
+  function openPanel() { panel.hidden = false; scrim.hidden = false; renderList(); setTimeout(() => $('addInput').focus(), 60); }
+  function closePanel() { panel.hidden = true; scrim.hidden = true; openTr = -1; }
+  settingsBtn.addEventListener('click', openPanel);
+  $('closeBtn').addEventListener('click', closePanel);
+  scrim.addEventListener('click', closePanel);
+
+  const seg = $('reelSeg');
+  function renderSeg() { seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.r) === reelCount))); }
+  seg.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || anySpinning()) return;
+    reelCount = Number(b.dataset.r);
+    try { localStorage.setItem(KEY + '.reels', String(reelCount)); } catch (e) {}
+    renderSeg(); buildReels(); outcome.hidden = true;
+    setHint('hintIdle', { n: reelCount });
+  });
+
+  function renderList() {
+    const n = active().length;
+    list.innerHTML = '';
+    items.forEach((it, i) => {
+      const li = document.createElement('li');
+      li.className = it.on ? '' : 'off';
+      const activeIdx = it.on ? active().indexOf(it) : -1;
+      const col = activeIdx >= 0 ? colorAt(activeIdx, n) : 'transparent';
+      const nm = nameOf(it);
+      const open = openTr === i;
+      li.innerHTML = `
+        <div class="main">
+          <label>
+            <input type="checkbox" ${it.on ? 'checked' : ''} data-i="${i}">
+            <span class="sw" style="background:${col};${activeIdx < 0 ? 'border:1px solid var(--line-2)' : ''}"></span>
+            <span class="nm">${esc(nm)}</span>
+          </label>
+          <button class="mini" data-tr="${i}" aria-expanded="${open}">${esc(t('translate'))}</button>
+          <button class="mini del" data-del="${i}" aria-label="${esc(t('delAria', { name: nm }))}">${esc(t('del'))}</button>
+        </div>
+        ${open ? `<div class="tr">${LANGS.map(l => `<span>${LANG_NAME[l]}</span><input type="text" maxlength="24" data-tl="${l}" data-ti="${i}" value="${esc(it.names[l] || '')}" placeholder="${esc(nameOf(it))}">`).join('')}</div>` : ''}`;
+      list.appendChild(li);
+    });
+    updateMeta();
+  }
+  list.addEventListener('change', e => {
+    const el = e.target;
+    if (el.dataset.i != null) { items[el.dataset.i].on = el.checked; save(); renderList(); refreshIdleReels(); return; }
+    if (el.dataset.tl) {
+      const it = items[el.dataset.ti]; if (!it) return;
+      const v = el.value.trim().replace(/\s+/g, ' ');
+      if (v) it.names[el.dataset.tl] = v; else delete it.names[el.dataset.tl];
+      if (!Object.values(it.names).some(Boolean)) it.names[lang] = el.value = nameOf(it) || '?';
+      save(); refreshIdleReels();
+      if (el.dataset.tl === lang) { const li = el.closest('li'); li.querySelector('.nm').textContent = nameOf(it); }
+    }
+  });
+  list.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.del != null) { items.splice(Number(b.dataset.del), 1); openTr = -1; save(); renderList(); refreshIdleReels(); return; }
+    if (b.dataset.tr != null) {
+      const i = Number(b.dataset.tr); openTr = openTr === i ? -1 : i; renderList();
+      if (openTr === i) { const inp = list.querySelector(`input[data-ti="${i}"][data-tl="${lang}"]`); if (inp) inp.focus(); }
+    }
+  });
+  $('addForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const inp = $('addInput');
+    const name = inp.value.trim().replace(/\s+/g, ' ');
+    if (!name) return;
+    if (items.length >= MAX) { setMsg(t('msgMax', { max: MAX })); return; }
+    if (items.some(it => LANGS.some(l => (it.names[l] || '').toLowerCase() === name.toLowerCase()))) { setMsg(t('msgDup', { name })); return; }
+    items.push({ names: { [lang]: name }, on: true }); save(); inp.value = '';
+    openTr = items.length - 1; renderList(); refreshIdleReels();
+    setMsg(t('msgAdded', { name }));
+    const tr = list.querySelector(`input[data-ti="${openTr}"]`); if (tr) tr.scrollIntoView({ block: 'nearest' });
+  });
+  $('allOnBtn').addEventListener('click', () => { items.forEach(it => it.on = true); save(); renderList(); refreshIdleReels(); });
+  $('resetBtn').addEventListener('click', () => {
+    if (!confirm(t('confirmReset', { n: DEFAULT.length }))) return;
+    items = DEFAULT.map(d => ({ names: { ...d }, on: true })); openTr = -1; save(); renderList(); refreshIdleReels(); setMsg(t('msgReset'));
+  });
+  let msgTimer = 0;
+  function setMsg(s) { msg.textContent = s; clearTimeout(msgTimer); msgTimer = setTimeout(() => { msgTimer = 0; msg.textContent = t('msgDefault', { max: MAX }); }, 3200); }
+  function updateMeta() { metaEl.innerHTML = t('meta', { n: active().length }); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+  // ---- boot ----
+  function measure() {
+    rowPx = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row')) || 82;
+    reels.forEach(render);
+  }
+  matchMedia('(min-width:600px)').addEventListener('change', measure);
+  measure(); renderSeg(); buildReels();
+  hintState = { key: 'hintIdle', params: { n: reelCount } };
+  applyLang();
+})();
+</script>
+</body>
+</html>
