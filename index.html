@@ -85,6 +85,15 @@ h1{
   background-repeat:no-repeat;background-position:right 12px center;
 }
 .sel:hover{border-color:rgba(244,241,234,.3)}
+@media (max-width:480px){
+  .top{flex-direction:column;align-items:stretch;gap:12px;padding-left:18px;padding-right:18px}
+  .actions{justify-content:space-between;flex-wrap:nowrap;gap:6px}
+  .actions .btn,.actions .sel{padding:7px 11px;font-size:12.5px;white-space:nowrap}
+  .actions .sel{padding-right:26px;background-position:right 9px center;min-width:0}
+  .actions .btn.ghost{padding:7px 6px}
+  .stage{padding-left:14px;padding-right:14px}
+  .cabinet{padding:18px 14px 16px;border-radius:24px}
+}
 .sel option{background:var(--surface);color:var(--text)}
 
 /* ---- stage ---- */
@@ -147,6 +156,14 @@ h1{
 .row>span.m{font-size:17px}
 .row>span.s{font-size:14px;letter-spacing:.01em}
 .row>span.xs{font-size:12.5px;letter-spacing:0;line-height:1.15}
+@media (max-width:399px){
+  :root{--row:76px}
+  .row>span{font-size:17px;letter-spacing:.02em}
+  .row>span.m{font-size:14px}
+  .row>span.s{font-size:12px}
+  .row>span.xs{font-size:10.5px}
+  .reels{gap:8px}
+}
 @media (max-width:599px){
   .reels[data-count="4"] .row>span{font-size:15px;letter-spacing:.01em}
   .reels[data-count="4"] .row>span.m{font-size:13px}
@@ -245,15 +262,16 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
 .dots{display:flex;gap:14px;padding:4px 0 6px}
 .dots i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line-2);display:block;transition:background .12s,border-color .12s}
 .dots i.on{background:var(--accent);border-color:var(--accent)}
-.pad{display:grid;grid-template-columns:repeat(3,68px);gap:10px}
+.pad{display:grid;grid-template-columns:repeat(3,minmax(0,68px));gap:10px;width:100%;max-width:224px}
 .pad button{
-  appearance:none;width:68px;height:56px;border-radius:16px;border:1px solid var(--line-2);background:transparent;
+  appearance:none;width:100%;height:56px;padding:0;border-radius:16px;border:1px solid var(--line-2);background:transparent;
   color:var(--text);font-family:var(--font-latin);font-size:22px;font-weight:500;cursor:pointer;
   transition:background .12s,border-color .12s;
 }
 .pad button:hover{background:rgba(244,241,234,.06)}
 .pad button:active{background:var(--accent-soft);border-color:var(--accent)}
-.pad button.ghost{border-color:transparent;color:var(--muted);font-size:18px}
+.pad button.ghost{border-color:transparent;color:var(--muted);font-size:13px;font-family:var(--font-sans);letter-spacing:0;white-space:nowrap}
+.pad button.ghost[data-d]{font-size:18px}
 .pinfield{padding-top:10px}
 .pinfield form{display:flex;gap:6px;padding:0}
 .pinfield input[type=password]{
@@ -391,7 +409,7 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
       <button type="button" data-d="1">1</button><button type="button" data-d="2">2</button><button type="button" data-d="3">3</button>
       <button type="button" data-d="4">4</button><button type="button" data-d="5">5</button><button type="button" data-d="6">6</button>
       <button type="button" data-d="7">7</button><button type="button" data-d="8">8</button><button type="button" data-d="9">9</button>
-      <button type="button" class="ghost" id="pinCancel" data-t="pinCancel"></button><button type="button" data-d="0">0</button><button type="button" class="ghost" data-d="del" aria-label="Backspace">⌫</button>
+      <button type="button" class="ghost" id="pinCancel" data-t="close"></button><button type="button" data-d="0">0</button><button type="button" class="ghost" data-d="del" aria-label="Backspace">⌫</button>
     </div>
   </div>
 </div>
@@ -730,6 +748,23 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
       });
     }
     r.strip.appendChild(frag);
+    fitStrip(r);
+  }
+  // 5文字以下の名前は折り返さず、収まるまで文字を縮める（言語・画面幅を問わず）
+  function fitStrip(r) {
+    if (!r.n || !r.strip.isConnected) return;
+    const spans = r.strip.querySelectorAll('.row>span');
+    const range = document.createRange();
+    for (let i = 0; i < r.n; i++) {
+      const sp = spans[i]; if (!sp) break;
+      sp.style.fontSize = '';
+      if (units(sp.textContent) > 5) continue;
+      let fs = parseFloat(getComputedStyle(sp).fontSize), guard = 0;
+      range.selectNodeContents(sp);
+      while (range.getClientRects().length > 1 && fs > 10 && guard++ < 10) { fs -= 0.5; sp.style.fontSize = fs + 'px'; }
+      const v = sp.style.fontSize;
+      for (let c = 1; c < 3; c++) { const o = spans[i + c * r.n]; if (o) o.style.fontSize = v; }
+    }
   }
   function render(r) {
     if (!r.n) return;
@@ -1137,6 +1172,10 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
     reels.forEach(render);
   }
   matchMedia('(min-width:600px)').addEventListener('change', measure);
+  matchMedia('(min-width:400px)').addEventListener('change', measure);
+  let fitTimer = 0;
+  new ResizeObserver(() => { clearTimeout(fitTimer); fitTimer = setTimeout(() => { measure(); reels.forEach(fitStrip); }, 80); }).observe(reelsEl);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => reels.forEach(fitStrip));
   measure(); renderSeg(); buildReels();
   hintState = { key: 'hintIdle', params: { n: reelCount } };
   applyLang();
