@@ -2,6 +2,10 @@
 
 飲食店でカレーのトッピングを決めるスロットマシン風Webアプリ。単一の `index.html` で動作し、ライブラリ依存はありません。
 
+**公開URL（GitHub Pages）:** https://taeeeee-uou.github.io/curry-topping-slot/
+
+`main` ブランチを更新すると、1〜2分ほどで上のURLに反映されます。編集は GitHub 上の鉛筆アイコンから直接行えます。
+
 ## 使い方
 
 - `index.html` をブラウザで開くだけで動きます（GitHub Pages などの静的ホスティングにそのまま置けます）
