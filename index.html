@@ -231,6 +231,38 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
   border:1px solid var(--line-2);color:var(--text);font-size:12px;letter-spacing:.03em;
 }
 
+/* ---- PIN ---- */
+.pin{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:20px;background:rgba(6,7,10,.7);backdrop-filter:blur(4px)}
+.pin-card{
+  width:min(92vw,340px);background:var(--surface);border:1px solid var(--line);border-radius:24px;
+  padding:26px 22px 18px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+}
+.pin-card.shake{animation:shake .4s}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.pin-sub{margin:0;font-size:13px;color:var(--muted);min-height:1.7em}
+.pin-sub.err{color:#f28b7d}
+.dots{display:flex;gap:14px;padding:4px 0 6px}
+.dots i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line-2);display:block;transition:background .12s,border-color .12s}
+.dots i.on{background:var(--accent);border-color:var(--accent)}
+.pad{display:grid;grid-template-columns:repeat(3,68px);gap:10px}
+.pad button{
+  appearance:none;width:68px;height:56px;border-radius:16px;border:1px solid var(--line-2);background:transparent;
+  color:var(--text);font-family:var(--font-latin);font-size:22px;font-weight:500;cursor:pointer;
+  transition:background .12s,border-color .12s;
+}
+.pad button:hover{background:rgba(244,241,234,.06)}
+.pad button:active{background:var(--accent-soft);border-color:var(--accent)}
+.pad button.ghost{border-color:transparent;color:var(--muted);font-size:18px}
+.pinfield{padding-top:10px}
+.pinfield form{display:flex;gap:6px;padding:0}
+.pinfield input[type=password]{
+  width:92px;border:1px solid var(--line-2);background:var(--ink);color:var(--text);
+  border-radius:999px;padding:6px 12px;font-size:15px;letter-spacing:.3em;text-align:center;font-family:var(--font-latin);
+}
+.pinfield input:focus{outline:none;border-color:var(--accent)}
+.note{padding:0 20px 4px;font-size:12px;color:var(--accent);opacity:.85}
+
 /* ---- confetti ---- */
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:15}
 
@@ -350,6 +382,20 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
 
 <canvas id="confetti" hidden></canvas>
 
+<div class="pin" id="pin" hidden>
+  <div class="pin-card" id="pinCard" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+    <span class="eyebrow" id="pinTitle" data-t="pinTitle"></span>
+    <p class="pin-sub" id="pinSub"></p>
+    <div class="dots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="pad" id="pinPad">
+      <button type="button" data-d="1">1</button><button type="button" data-d="2">2</button><button type="button" data-d="3">3</button>
+      <button type="button" data-d="4">4</button><button type="button" data-d="5">5</button><button type="button" data-d="6">6</button>
+      <button type="button" data-d="7">7</button><button type="button" data-d="8">8</button><button type="button" data-d="9">9</button>
+      <button type="button" class="ghost" id="pinCancel" data-t="pinCancel"></button><button type="button" data-d="0">0</button><button type="button" class="ghost" data-d="del" aria-label="Backspace">⌫</button>
+    </div>
+  </div>
+</div>
+
 <div class="scrim" id="scrim" hidden></div>
 <aside class="panel" id="panel" hidden>
   <header>
@@ -370,6 +416,14 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
   </form>
   <p class="msg" id="msg"></p>
   <ul class="list" id="list"></ul>
+  <div class="field pinfield">
+    <span data-t="pinField"></span>
+    <form id="pinForm" novalidate>
+      <input type="password" id="pinNew" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••">
+      <button class="btn" type="submit" data-t="pinChange"></button>
+    </form>
+  </div>
+  <p class="note" id="pinNote" data-t="pinDefaultNote"></p>
   <footer>
     <span data-t="noDup">同じトッピングは重複しません</span>
     <div style="display:flex;gap:6px">
@@ -419,6 +473,8 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
   ];
   const STR = {
     ja: {
+      pinTitle: '管理者PIN', pinSub: 'スタッフ用。4桁を入力してください', pinWrong: 'PINが違います', pinCancel: 'キャンセル',
+      pinField: '管理者PIN（4桁）', pinChange: '変更', pinChanged: 'PINを変更しました', pinInvalid: '4桁の数字で入力してください', pinDefaultNote: '初期PINは 9999 です。変更をおすすめします',
       title: 'トッピングスロット', sound: '効果音', edit: 'トッピングを編集', close: '閉じる',
       start: 'スタート', stop: 'ストップ', respin: '回し直す',
       hintIdle: 'スタートを押すと <strong>{n}つ</strong> のトッピングが決まります',
@@ -442,6 +498,8 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
       tags: ['いい組み合わせです', '店主も好きな組み合わせ', '今日はこれで決まり', '迷ったときの正解', '攻めた組み合わせ、いいですね', 'スパイスと相性よし'],
     },
     zh: {
+      pinTitle: '管理员密码', pinSub: '仅限员工。请输入4位数字', pinWrong: '密码错误', pinCancel: '取消',
+      pinField: '管理员密码（4位）', pinChange: '更改', pinChanged: '密码已更改', pinInvalid: '请输入4位数字', pinDefaultNote: '初始密码为 9999，建议修改',
       title: '配料老虎机', sound: '音效', edit: '编辑配料', close: '关闭',
       start: '开始', stop: '停止', respin: '重转',
       hintIdle: '按开始，随机选出 <strong>{n} 种</strong> 配料',
@@ -465,6 +523,8 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
       tags: ['很不错的搭配', '店主也喜欢这个组合', '今天就选这个', '纠结时的正确答案', '很大胆的搭配，不错', '和香料很搭'],
     },
     en: {
+      pinTitle: 'Staff PIN', pinSub: 'Staff only. Enter the 4-digit PIN', pinWrong: 'Wrong PIN', pinCancel: 'Cancel',
+      pinField: 'Staff PIN (4 digits)', pinChange: 'Change', pinChanged: 'PIN changed', pinInvalid: 'Enter 4 digits', pinDefaultNote: 'The default PIN is 9999. Please change it',
       title: 'Topping Slot', sound: 'Sound', edit: 'Edit toppings', close: 'Close',
       start: 'START', stop: 'STOP', respin: 'Respin',
       hintIdle: 'Press start to pick <strong>{n} toppings</strong>',
@@ -488,6 +548,8 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
       tags: ['A fine combination', 'One of the owner’s favourites', 'That settles today’s curry', 'The right call when in doubt', 'Bold choice, we like it', 'Pairs well with the spices'],
     },
     ms: {
+      pinTitle: 'PIN staf', pinSub: 'Staf sahaja. Masukkan PIN 4 digit', pinWrong: 'PIN salah', pinCancel: 'Batal',
+      pinField: 'PIN staf (4 digit)', pinChange: 'Tukar', pinChanged: 'PIN ditukar', pinInvalid: 'Masukkan 4 digit', pinDefaultNote: 'PIN lalai ialah 9999. Sila tukar',
       title: 'Slot Topping', sound: 'Bunyi', edit: 'Sunting topping', close: 'Tutup',
       start: 'MULA', stop: 'BERHENTI', respin: 'Putar semula',
       hintIdle: 'Tekan mula untuk memilih <strong>{n} topping</strong>',
@@ -850,6 +912,12 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
   });
   startBtn.addEventListener('click', start);
   document.addEventListener('keydown', e => {
+    if (!pinEl.hidden) {
+      if (/^\d$/.test(e.key)) pinInput(e.key);
+      else if (e.key === 'Backspace') pinInput('del');
+      else if (e.key === 'Escape') closePin();
+      return;
+    }
     if (e.key === 'Escape' && !panel.hidden) closePanel();
     if (e.key === ' ' && panel.hidden && !['INPUT', 'BUTTON', 'SELECT'].includes(document.activeElement.tagName)) { e.preventDefault(); start(); }
   });
@@ -947,8 +1015,41 @@ html[lang="en"] .start,html[lang="ms"] .start{font-family:var(--font-latin);lett
   function stopConfetti() { cancelAnimationFrame(cfRaf); cctx.clearRect(0, 0, cf.width, cf.height); cf.hidden = true; }
 
   // ---- settings panel ----
-  function openPanel() { panel.hidden = false; scrim.hidden = false; renderList(); setTimeout(() => $('addInput').focus(), 60); }
-  function closePanel() { panel.hidden = true; scrim.hidden = true; openTr = -1; }
+  // ---- 管理者PIN（お客さんが編集パネルを開けないように） ----
+  const PIN_KEY = KEY + '.pin', DEFAULT_PIN = '9999';
+  let pin = DEFAULT_PIN;
+  try { const v = localStorage.getItem(PIN_KEY); if (/^\d{4}$/.test(v || '')) pin = v; } catch (e) {}
+  let unlocked = false, entered = '';
+  const pinEl = $('pin'), pinCard = $('pinCard'), pinSub = $('pinSub'), pinDots = $('pinDots');
+  function renderDots() { [...pinDots.children].forEach((d, i) => d.classList.toggle('on', i < entered.length)); }
+  function openPanel() {
+    if (unlocked) { showPanel(); return; }
+    entered = ''; renderDots(); pinSub.textContent = t('pinSub'); pinSub.classList.remove('err');
+    pinEl.hidden = false;
+  }
+  function closePin() { pinEl.hidden = true; entered = ''; }
+  function pinInput(d) {
+    if (d === 'del') { entered = entered.slice(0, -1); renderDots(); return; }
+    if (entered.length >= 4) return;
+    entered += d; renderDots();
+    if (entered.length < 4) return;
+    if (entered === pin) { unlocked = true; closePin(); showPanel(); return; }
+    pinSub.textContent = t('pinWrong'); pinSub.classList.add('err');
+    pinCard.classList.remove('shake'); void pinCard.offsetWidth; pinCard.classList.add('shake');
+    setTimeout(() => { entered = ''; renderDots(); }, 350);
+  }
+  $('pinPad').addEventListener('click', e => { const b = e.target.closest('button[data-d]'); if (b) pinInput(b.dataset.d); });
+  $('pinCancel').addEventListener('click', closePin);
+  pinEl.addEventListener('click', e => { if (e.target === pinEl) closePin(); });
+  $('pinForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const v = $('pinNew').value.trim();
+    if (!/^\d{4}$/.test(v)) { setMsg(t('pinInvalid')); return; }
+    pin = v; try { localStorage.setItem(PIN_KEY, v); } catch (err) {}
+    $('pinNew').value = ''; $('pinNote').hidden = pin !== DEFAULT_PIN; setMsg(t('pinChanged'));
+  });
+  function showPanel() { panel.hidden = false; scrim.hidden = false; $('pinNote').hidden = pin !== DEFAULT_PIN; renderList(); setTimeout(() => $('addInput').focus(), 60); }
+  function closePanel() { panel.hidden = true; scrim.hidden = true; openTr = -1; unlocked = false; }   // 閉じたら再ロック
   settingsBtn.addEventListener('click', openPanel);
   $('closeBtn').addEventListener('click', closePanel);
   scrim.addEventListener('click', closePanel);
